@@ -11,6 +11,7 @@ generator client {
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
+  // url      = "mongodb+srv://Rahul:1BrvdlKhRyQz80ow@cluster0.kfdxhoz.mongodb.net/note-database?retryWrites=true&w=majority&appName=Cluster0"
 }
 
 model Note {

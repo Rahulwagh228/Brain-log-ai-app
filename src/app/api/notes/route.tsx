@@ -6,7 +6,7 @@ export async function POST (req: Request){
     try{
         const body = await req.json();
 
-        console.log(body)
+        
         const parseResult = createNoteSchema.safeParse(body);
 
 
@@ -27,8 +27,10 @@ export async function POST (req: Request){
                 title,
                 content,
                 userId,
+                
             }
         })
+       
 
         return Response.json({note}, {status: 201})
     } catch(error){
