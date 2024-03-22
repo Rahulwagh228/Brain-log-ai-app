@@ -21,9 +21,13 @@ import { useState } from "react";
 interface AddEditNoteDialogProps {
   open: boolean;
   setopen: (open: boolean) => void;
-  noteToEdit?: Note;
+  noteToEdit: Note;
 }
-export default function AddEditNoteDialog({ open, setopen, noteToEdit }: AddEditNoteDialogProps) {
+export default function AddEditNoteDialog({
+  open,
+  setopen,
+  noteToEdit,
+}: AddEditNoteDialogProps) {
   const [deleteInProgress, setDeleteInProgress] = useState(false);
   const router = useRouter();
 
@@ -31,71 +35,67 @@ export default function AddEditNoteDialog({ open, setopen, noteToEdit }: AddEdit
     resolver: zodResolver(createNoteSchema),
     defaultValues: {
       title: noteToEdit?.title || "",
-      content:noteToEdit?.content ||  "",
+      content: noteToEdit?.content || "",
     },
   });
 
   async function onSubmit(input: createNoteSchema) {
     try {
+      if (noteToEdit) {
+        const response = await fetch("/api/note", {
+          method: "PUT",
+          body: JSON.stringify({
+            id: noteToEdit.id,
+            ...input,
+          }),
+        });
+        if (!response.ok) throw Error("status codeee: " + response.status);
+      } else {
+        const response = await fetch("/api/notes", {
+          method: "POST",
+          body: JSON.stringify(input),
+        });
 
-      if(noteToEdit){
-          const response = await fetch("/api/note", {
-            method: "PUT",
-            body:  JSON.stringify({
-              id: noteToEdit.id,
-              ...input
-            }),
-          });
-      if (!response.ok) throw Error("status code: " + response.status);
-
-      }else{
-
-
-      const response = await fetch("/api/notes", {
-        method: "POST",
-        body: JSON.stringify(input),
-      });
-
-      if (!response.ok) throw Error("status code: " + response.status);
-      form.reset();
-    }
+        if (!response.ok) throw Error("status code: " + response.status);
+        form.reset();
+      }
 
       router.refresh();
       setopen(false);
     } catch (error) {
       console.error(error);
-      alert("something went wrong. please try again");
+      alert("something went wrong in obsubmit funct. please try again");
     }
   }
 
-
-async function deleteNote(){
-  if(!noteToEdit) return;
-  setDeleteInProgress(true)
-  try {
-    const response = await fetch("/api/notes",{
-      method: "DELETE",
-      body: JSON.stringify({
-        id: noteToEdit.id
-      })
-    })
-    if (!response.ok) throw Error("status code: " + response.status);
-
-  } catch (error) {
-    console.error(error);
-      alert("something went wrong. please try again");
-  }finally{
-    setDeleteInProgress(false)
+  async function deleteNote() {
+    if (!noteToEdit) return;
+    setDeleteInProgress(true);
+    try {
+      const response = await fetch("/api/notes", {
+        method: "DELETE",
+        body: JSON.stringify({
+          id: noteToEdit.id,
+        }),
+      });
+      if (!response.ok) throw Error("status code: " + response.status);
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      alert("something went wrong in deletion . please try again");
+    } finally {
+      setDeleteInProgress(false);
+    }
   }
-}
-
 
   return (
     <Dialog open={open} onOpenChange={setopen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{noteToEdit ? "Edit Note" : "Add Note"}
-            <div className="text-center font-extrabold">Add Note</div>
+          <DialogTitle>
+            <div className="text-center font-extrabold">
+              {noteToEdit ? "Edit Note" : "Add Note"}
+            </div>
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -129,15 +129,14 @@ async function deleteNote(){
             <DialogFooter className="gap-1 sm:gap-0">
               {noteToEdit && (
                 <LoadingButton
-                variant="destructive"
-                loading={deleteInProgress}
-                disabled={form.formState.isSubmitting}
-                onClick={deleteNote}
-                type="button"
+                  variant="destructive"
+                  loading={deleteInProgress}
+                  disabled={form.formState.isSubmitting}
+                  onClick={deleteNote}
+                  type="button"
                 >
                   Delete Note
                 </LoadingButton>
-                
               )}
               <LoadingButton
                 type="submit"
