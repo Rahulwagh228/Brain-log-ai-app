@@ -8,7 +8,6 @@ import {OpenAIStream, StreamingTextResponse} from "ai"
 
 export async function POST(req: Request){
     try {
-        
         const body = await req.json();
 
         const messages: ChatCompletionMessage[] = body.messages;
