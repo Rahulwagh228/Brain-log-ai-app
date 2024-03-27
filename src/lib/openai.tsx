@@ -6,7 +6,7 @@ if(!apiKey){
     throw Error ("OPENAI_API_KEY is not set")
 }
 
-const openai = new OpenAI({apiKey});
+export const openai = new OpenAI({apiKey});
 
 export async function getEmbedding(text: string){
     const response = await openai.embeddings.create({
