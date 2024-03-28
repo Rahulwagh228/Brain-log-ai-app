@@ -15,12 +15,21 @@ export default async function NotesPage () {
     if(!userId) throw Error("userId undefined");
 
     const allNotes = await prisma.note.findMany({where: {userId}})
+    console.log(allNotes,'Data');
+    // try {
+
+    //     return allNotes;
+        
+    // } catch (error) {
+        
+    // }
+
 
     return( 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {
-                allNotes.map((note) => (
-                    <Note note={note} key={note.id} />
+                allNotes.map((notes) => (
+                    <Note note={notes} key={notes.id} />
                 ))
             }
             {allNotes.length === 0 && (
