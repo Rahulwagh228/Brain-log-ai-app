@@ -16,13 +16,6 @@ export default async function NotesPage () {
 
     const allNotes = await prisma.note.findMany({where: {userId}})
     console.log(allNotes,'Data');
-    // try {
-
-    //     return allNotes;
-        
-    // } catch (error) {
-        
-    // }
 
 
     return( 
