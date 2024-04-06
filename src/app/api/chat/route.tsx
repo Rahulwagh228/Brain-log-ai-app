@@ -6,6 +6,16 @@ import { ChatCompletionMessage } from "openai/resources/index.mjs";
 import {openai} from "@/lib/openai";
 import {OpenAIStream, StreamingTextResponse} from "ai"
 
+export async function Notedate (){
+    const { userId } = auth();
+    if(!userId) throw Error("userId undefined");
+    
+
+    const allNotes = await prisma.note.findMany({where: {userId}})
+    // console.log(allNotes,'Data');
+return allNotes;
+}
+
 export async function POST(req: Request){
     try {
         const body = await req.json();
