@@ -6,7 +6,7 @@ import { ChatCompletionMessage } from "openai/resources/index.mjs";
 import {openai} from "@/lib/openai";
 import {OpenAIStream, StreamingTextResponse} from "ai"
 
-export async function Notedate (){
+export async function Notedata (){
     const { userId } = auth();
     if(!userId) throw Error("userId undefined");
     

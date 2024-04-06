@@ -1,8 +1,8 @@
 import Note from "@/components/ui/Note";
-import prisma from "@/lib/db/prisma";
-import { auth } from "@clerk/nextjs";
+// import prisma from "@/lib/db/prisma";
+// import { auth } from "@clerk/nextjs";
 import { Metadata } from "next"
-import { Notedate } from "../api/chat/route";
+import { Notedata } from "../api/chat/route";
 
 export const metadata: Metadata = {
     title: "Brainlog - Notes  "
@@ -19,7 +19,7 @@ export default async function NotesPage () {
     // const allNotes = await prisma.note.findMany({where: {userId}})
     // // console.log(allNotes,'Data');
 
-    const allNotes = await Notedate()
+    const allNotes = await Notedata()
 
     return( 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
