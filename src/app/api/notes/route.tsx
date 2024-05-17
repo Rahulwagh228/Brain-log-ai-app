@@ -8,6 +8,8 @@ import {
 } from "@/lib/validation/note";
 import { auth } from "@clerk/nextjs";
 
+
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();

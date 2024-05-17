@@ -5,7 +5,7 @@ import { Metadata } from "next"
 import { Notedata } from "../api/chat/route";
 
 export const metadata: Metadata = {
-    title: "Brainlog - Notes  "
+    title: "Brainlog - Notes "
 };
 
 

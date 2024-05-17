@@ -1,15 +1,18 @@
 import { cn } from "@/lib/utils";
 import { useChat } from "ai/react";
-import { Bot, Trash, XCircle } from "lucide-react";
+import { Bot, Box, Trash, XCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Message } from "ai";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, RefObject } from "react";
+import useClickOutside from "./useClickOutside";
+
 interface AIChatBoxProps {
   open: boolean;
   onClose: () => void;
+  ref?: RefObject<HTMLDivElement>;
 }
 
 export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
@@ -21,14 +24,14 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
     setMessages,
     isLoading,
     error,
-  } = useChat(); //api / chat --make request to this wroute by default
+  } = useChat(); // API / chat -- make request to this route by default
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const scrollref = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (scrollref.current) {
-      scrollref.current.scrollTop = scrollref.current.scrollHeight;
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
 
@@ -40,46 +43,50 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
 
   const lastMessageIsUser = messages[messages.length - 1]?.role === "user";
 
+  // Click outside functionality
+  const boxRef = useRef<HTMLDivElement>(null);
+  useClickOutside(boxRef, onClose);
+
   return (
     <div
       className={cn(
-        "full bottom-0 right-0 z-10 max-w-[500px] p-1 xl:right-36",
-        open ? "fixed" : "hidden",
+        "fixed full bottom-0 right-0 z-10 max-w-[500px] p-1 xl:right-36",
+        open ? "block" : "hidden"
       )}
+      ref={boxRef}
     >
       <button onClick={onClose} className="mb-1 ms-auto block">
         <XCircle size={30} />
       </button>
       <div className="flex h-[600px] flex-col rounded border bg-background shadow-xl">
-        <div className="mt-3 h-full overflow-y-auto px-3" ref={scrollref}>
-          {messages.map((messages) => (
-            <ChatMessage message={messages} key={messages.id} />
+        <div className="mt-3 h-full overflow-y-auto px-3" ref={scrollRef}>
+          {messages.map((message) => (
+            <ChatMessage message={message} key={message.id} />
           ))}
           {isLoading && lastMessageIsUser && (
-            <ChatMessage 
-            message={{
+            <ChatMessage
+              message={{
                 role: "assistant",
                 content: "Ruko jra sabr kro...\n bola na dhakkabukki nahi krneka",
-            }}
+              }}
             />
           )}
 
           {error && (
-            <ChatMessage 
-            message={{
-                role:"assistant",
-                content: "something went wrong please try again"
-            }}
+            <ChatMessage
+              message={{
+                role: "assistant",
+                content: "Something went wrong. Please try again.",
+              }}
             />
           )}
 
-        {!error && messages.length === 0 && (
+          {!error && messages.length === 0 && (
             <div className="flex h-full items-center justify-center gap-3">
-                <Bot />
-                Ask the AI Questions About Your Notes...
+              <Bot />
+              Ask the AI Questions About Your Notes...
             </div>
-        )}
-
+          )}
         </div>
         <form onSubmit={handleSubmit} className="m-3 flex gap-1">
           <Button
@@ -95,7 +102,7 @@ export default function AIChatBox({ open, onClose }: AIChatBoxProps) {
           <Input
             value={input}
             onChange={handleInputChange}
-            placeholder="Say somethin..."
+            placeholder="Say something..."
             ref={inputRef}
           />
           <Button type="submit">Send</Button>
@@ -117,17 +124,14 @@ function ChatMessage({
     <div
       className={cn(
         "mb-3 flex items-center",
-        isAiMessage ? "me-5 justify-start" : " ms-5 justify-end",
+        isAiMessage ? "me-5 justify-start" : "ms-5 justify-end"
       )}
     >
-      {/* <div>{role}</div>
-            <div>{content}</div> */}
-
       {isAiMessage && <Bot className="mr-2 shrink-0" />}
       <p
         className={cn(
           "whitespace-pre-line rounded-md border px-3 py-2",
-          isAiMessage ? "bg-background" : "bg-primary text-primary-foreground",
+          isAiMessage ? "bg-background" : "bg-primary text-primary-foreground"
         )}
       >
         {content}
